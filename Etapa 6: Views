@@ -1,32 +1,31 @@
 --- 25. vw_agenda_medica
 CREATE VIEW vw_agenda_medica AS
 SELECT 
-    m.nome_medico, 
-    e.nome_especialidade, 
-    p.nome_paciente, 
+    m.nome AS medico, 
+    e.nome AS especialidade, 
+    p.nome AS paciente, 
     c.data, 
     c.horario, 
     c.status
-FROM CONSULTA c
-JOIN MEDICO m ON c.id_medico = m.id_medico
-JOIN ESPECIALIDADE e ON c.id_especialidade = e.id_especialidade
-JOIN PACIENTE p ON c.id_paciente = p.id_paciente
+FROM Consulta c
+JOIN Medico m ON c.id_medico = m.id_medico
+JOIN Especialidade e ON c.id_especialidade = e.id_especialidade
+JOIN Paciente p ON c.id_paciente = p.id_paciente
 WHERE c.status IN ('agendada', 'realizada');
-
 --- 26. vw_historico_paciente
 CREATE VIEW vw_historico_paciente AS
 SELECT 
-    p.nome_paciente, 
+    p.nome AS paciente, 
     c.data, 
     c.diagnostico,
     pr.medicamento, 
-    pr.dosagem
-FROM PACIENTE p
-JOIN CONSULTA c ON p.id_paciente = c.id_paciente
-LEFT JOIN PRESCRICAO pr ON c.id_consulta = pr.id_consulta
+    pr.dosagem, 
+    pr.orientacoes
+FROM Paciente p
+JOIN Consulta c ON p.id_paciente = c.id_paciente
+LEFT JOIN Prescricao pr ON c.id_consulta = pr.id_consulta
 WHERE c.status = 'realizada';
-
 --- 27. Consulta e Justificativa
-SELECT nome_paciente, horario, nome_especialidade, status 
+SELECT paciente, horario, especialidade, status 
 FROM vw_agenda_medica 
-WHERE nome_medico = 'Dr. Pedro' AND data = '2023-11-20';
+WHERE medico = 'Dr. Silva' AND data = '2023-11-20';
