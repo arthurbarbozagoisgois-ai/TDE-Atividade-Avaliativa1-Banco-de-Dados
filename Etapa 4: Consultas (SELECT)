@@ -1,0 +1,61 @@
+-- 13.
+SELECT nome_paciente, cpf_paciente, email_paciente, data_cadastro 
+FROM PACIENTE 
+WHERE data_cadastro > '2023-01-01' 
+ORDER BY nome_paciente ASC;
+
+-- 14. 
+-- Devido à estrutura do diagrama, a especialidade está apenas num campo de texto no Médico. Listamos dessa forma.
+SELECT nome_medico, especialidade_medico 
+FROM MEDICO;
+
+-- 15.
+SELECT m.nome_medico, COUNT(c.id_consulta) AS qtd_consultas, AVG(c.valor) AS valor_medio
+FROM MEDICO m
+JOIN CONSULTA c ON m.id_medico = c.id_medico
+WHERE c.status = 'realizada'
+GROUP BY m.nome_medico;
+
+-- 16.
+SELECT m.nome_medico
+FROM MEDICO m
+JOIN CONSULTA c ON m.id_medico = c.id_medico
+GROUP BY m.nome_medico
+HAVING COUNT(c.id_consulta) > 3;
+
+-- 17.
+SELECT p.nome_paciente, m.nome_medico, c.data, c.horario
+FROM CONSULTA c
+INNER JOIN PACIENTE p ON c.id_paciente = p.id_paciente
+INNER JOIN MEDICO m ON c.id_medico = m.id_medico
+WHERE c.status = 'agendada' 
+  AND c.data BETWEEN CURRENT_DATE AND CURRENT_DATE + INTERVAL '7 days';
+
+-- 18.
+SELECT p.nome_paciente, MAX(c.data) AS ultima_consulta
+FROM PACIENTE p
+LEFT JOIN CONSULTA c ON p.id_paciente = c.id_paciente
+GROUP BY p.nome_paciente;
+
+-- 19.
+SELECT e.nome_especialidade, SUM(c.valor) AS total_faturado
+FROM ESPECIALIDADE e
+JOIN CONSULTA c ON e.id_especialidade = c.id_especialidade
+WHERE c.status = 'realizada'
+GROUP BY e.nome_especialidade;
+
+-- 20.
+SELECT m.nome_medico, COUNT(c.id_consulta) AS total_consultas
+FROM MEDICO m
+JOIN CONSULTA c ON m.id_medico = c.id_medico
+WHERE c.status = 'realizada'
+GROUP BY m.nome_medico
+ORDER BY total_consultas DESC
+LIMIT 3;
+
+-- 21.
+SELECT EXTRACT(MONTH FROM data) AS mes, SUM(valor) AS faturamento
+FROM CONSULTA
+WHERE status = 'realizada'
+GROUP BY EXTRACT(MONTH FROM data)
+ORDER BY mes;
