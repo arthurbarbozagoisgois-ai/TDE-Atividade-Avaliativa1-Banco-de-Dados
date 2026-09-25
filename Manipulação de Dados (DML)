@@ -1,0 +1,37 @@
+-- 7. Inserir paciente (Como o diagrama unificou o contato, tudo é feito em um único INSERT)
+INSERT INTO PACIENTE (nome_paciente, cpf_paciente, email_paciente, telefone_paciente, data_nascimento) 
+VALUES ('Ana Souza', '111.222.333-44', 'ana@email.com', '(11) 99999-9999', '1985-05-20');
+
+-- 8. Associar um médico a duas especialidades
+-- Como não há tabela associativa no diagrama, inserimos as duas como texto no campo do médico e criamos as áreas na tabela ESPECIALIDADE.
+INSERT INTO MEDICO (nome_medico, crm_medico, email_medico, especialidade_medico) 
+VALUES ('Dr. Pedro', 'CRM123', 'pedro@med.com', 'Cardiologia, Clínica Médica');
+
+INSERT INTO ESPECIALIDADE (nome_especialidade, descricao_especialidade) VALUES ('Cardiologia', 'Trata do coração');
+INSERT INTO ESPECIALIDADE (nome_especialidade, descricao_especialidade) VALUES ('Clínica Médica', 'Atendimento geral');
+
+-- 9. Agendar consulta e registrar duas prescrições
+BEGIN;
+INSERT INTO CONSULTA (id_paciente, id_medico, id_especialidade, data, horario, status, motivo, valor, diagnostico) 
+VALUES (1, 1, 1, CURRENT_DATE, '10:00', 'realizada', 'Dor no peito', 250.00, 'Pressão alta');
+
+INSERT INTO PRESCRICAO (id_consulta, medicamento, dosagem, frequencia, duracao, orientacoes) 
+VALUES (1, 'Losartana', '50mg', '12/12h', 'Contínuo', 'Após as refeições');
+
+INSERT INTO PRESCRICAO (id_consulta, medicamento, dosagem, frequencia, duracao, orientacoes) 
+VALUES (1, 'AAS', '100mg', '24/24h', '30 dias', 'Pela manhã');
+COMMIT;
+
+-- 10. Reajustar em 8% o valor das consultas de uma especialidade
+UPDATE CONSULTA 
+SET valor = valor * 1.08 
+WHERE id_especialidade = 1;
+
+-- 11. Alterar status para cancelada e registrar justificativa
+UPDATE CONSULTA 
+SET status = 'cancelada', observacao = 'Paciente teve um imprevisto'
+WHERE id_consulta = 2 AND status = 'agendada';
+
+-- 12. Exclusão de especialidade
+DELETE FROM ESPECIALIDADE WHERE id_especialidade = 1;
+-- Explicação: Como a chave id_especialidade é FK na tabela CONSULTA, o banco de dados impedirá a exclusão (erro de restrição de chave estrangeira), mantendo a integridade dos dados históricos.
