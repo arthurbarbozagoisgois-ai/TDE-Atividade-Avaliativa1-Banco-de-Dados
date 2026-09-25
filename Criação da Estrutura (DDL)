@@ -1,0 +1,58 @@
+-- Criação da tabela PACIENTE
+CREATE TABLE PACIENTE (
+    id_paciente SERIAL PRIMARY KEY,
+    cpf_paciente VARCHAR(14) UNIQUE NOT NULL,
+    email_paciente VARCHAR(150) UNIQUE,
+    telefone_paciente VARCHAR(20),
+    data_nascimento DATE NOT NULL,
+    data_cadastro DATE DEFAULT CURRENT_DATE NOT NULL,
+    nome_paciente VARCHAR(150) NOT NULL
+);
+
+-- Criação da tabela MEDICO
+CREATE TABLE MEDICO (
+    id_medico SERIAL PRIMARY KEY,
+    nome_medico VARCHAR(150) NOT NULL,
+    crm_medico VARCHAR(20) UNIQUE NOT NULL,
+    email_medico VARCHAR(150) UNIQUE NOT NULL,
+    especialidade_medico VARCHAR(150) 
+);
+
+-- Criação da tabela ESPECIALIDADE
+CREATE TABLE ESPECIALIDADE (
+    id_especialidade SERIAL PRIMARY KEY,
+    nome_especialidade VARCHAR(100) NOT NULL,
+    descricao_especialidade TEXT
+);
+
+-- Criação da tabela CONSULTA
+CREATE TABLE CONSULTA (
+    id_consulta SERIAL PRIMARY KEY,
+    id_paciente INT NOT NULL,
+    id_medico INT NOT NULL,
+    id_especialidade INT NOT NULL,
+    data DATE NOT NULL,
+    horario TIME NOT NULL,
+    diagnostico TEXT,
+    observacao TEXT,
+    -- Colunas abaixo adicionadas para atender aos requisitos das Etapas 3 e 4 da atividade:
+    status VARCHAR(20) DEFAULT 'agendada' NOT NULL,
+    motivo TEXT NOT NULL,
+    valor DECIMAL(10,2) NOT NULL,
+    FOREIGN KEY (id_paciente) REFERENCES PACIENTE(id_paciente),
+    FOREIGN KEY (id_medico) REFERENCES MEDICO(id_medico),
+    FOREIGN KEY (id_especialidade) REFERENCES ESPECIALIDADE(id_especialidade)
+);
+
+-- Criação da tabela PRESCRICAO
+CREATE TABLE PRESCRICAO (
+    id_prescricao SERIAL PRIMARY KEY,
+    id_consulta INT NOT NULL,
+    medicamento VARCHAR(150) NOT NULL,
+    dosagem VARCHAR(50) NOT NULL,
+    frequencia VARCHAR(50) NOT NULL,
+    duracao VARCHAR(50) NOT NULL,
+    -- Coluna abaixo adicionada para atender ao requisito da atividade:
+    orientacoes TEXT,
+    FOREIGN KEY (id_consulta) REFERENCES CONSULTA(id_consulta)
+);
