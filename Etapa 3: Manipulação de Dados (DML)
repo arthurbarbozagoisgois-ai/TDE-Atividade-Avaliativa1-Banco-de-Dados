@@ -1,37 +1,41 @@
--- 7. Inserir paciente (Como o diagrama unificou o contato, tudo é feito em um único INSERT)
-INSERT INTO PACIENTE (nome_paciente, cpf_paciente, email_paciente, telefone_paciente, data_nascimento) 
-VALUES ('Ana Souza', '111.222.333-44', 'ana@email.com', '(11) 99999-9999', '1985-05-20');
-
--- 8. Associar um médico a duas especialidades
--- Como não há tabela associativa no diagrama, inserimos as duas como texto no campo do médico e criamos as áreas na tabela ESPECIALIDADE.
-INSERT INTO MEDICO (nome_medico, crm_medico, email_medico, especialidade_medico) 
-VALUES ('Dr. Pedro', 'CRM123', 'pedro@med.com', 'Cardiologia, Clínica Médica');
-
-INSERT INTO ESPECIALIDADE (nome_especialidade, descricao_especialidade) VALUES ('Cardiologia', 'Trata do coração');
-INSERT INTO ESPECIALIDADE (nome_especialidade, descricao_especialidade) VALUES ('Clínica Médica', 'Atendimento geral');
-
--- 9. Agendar consulta e registrar duas prescrições
+-- 7. Cadastro de paciente e duas formas de contato
 BEGIN;
-INSERT INTO CONSULTA (id_paciente, id_medico, id_especialidade, data, horario, status, motivo, valor, diagnostico) 
-VALUES (1, 1, 1, CURRENT_DATE, '10:00', 'realizada', 'Dor no peito', 250.00, 'Pressão alta');
+INSERT INTO Paciente (nome, cpf, email, data_nascimento) 
+VALUES ('Carlos Almeida', '111.222.333-44', 'carlos@email.com', '1985-05-20');
 
-INSERT INTO PRESCRICAO (id_consulta, medicamento, dosagem, frequencia, duracao, orientacoes) 
-VALUES (1, 'Losartana', '50mg', '12/12h', 'Contínuo', 'Após as refeições');
-
-INSERT INTO PRESCRICAO (id_consulta, medicamento, dosagem, frequencia, duracao, orientacoes) 
-VALUES (1, 'AAS', '100mg', '24/24h', '30 dias', 'Pela manhã');
+INSERT INTO Contato_Paciente (id_paciente, telefone) VALUES (1, '(11) 99999-9999');
+INSERT INTO Contato_Paciente (id_paciente, telefone) VALUES (1, '(11) 3333-3333');
 COMMIT;
 
--- 10. Reajustar em 8% o valor das consultas de uma especialidade
-UPDATE CONSULTA 
+-- 8. Associação de médico a duas especialidades
+BEGIN;
+-- Assumindo Médico ID 1 (ex: Cardiologista) e Especialidades IDs 1 (Cardiologia) e 2 (Clínica Médica)
+INSERT INTO Medico_Especialidade (id_medico, id_especialidade) VALUES (1, 1);
+INSERT INTO Medico_Especialidade (id_medico, id_especialidade) VALUES (1, 2);
+COMMIT;
+
+-- 9. Agendamento de consulta, marcação como realizada e inserção de duas prescrições
+BEGIN;
+INSERT INTO Consulta (id_paciente, id_medico, id_especialidade, data, horario, status, motivo, valor, diagnostico) 
+VALUES (1, 1, 1, CURRENT_DATE, '10:00', 'realizada', 'Dor no peito', 250.00, 'Hipertensão leve');
+
+INSERT INTO Prescricao (id_consulta, medicamento, dosagem, frequencia, duracao, orientacoes) 
+VALUES (1, 'Losartana', '50mg', '12/12h', 'Uso contínuo', 'Tomar após refeição');
+
+INSERT INTO Prescricao (id_consulta, medicamento, dosagem, frequencia, duracao, orientacoes) 
+VALUES (1, 'AAS', '100mg', '24/24h', '30 dias', 'Tomar pela manhã');
+COMMIT;
+
+-- 10. Reajuste de 8% em uma especialidade (Assumindo id_especialidade = 1)
+UPDATE Consulta 
 SET valor = valor * 1.08 
 WHERE id_especialidade = 1;
 
--- 11. Alterar status para cancelada e registrar justificativa
-UPDATE CONSULTA 
-SET status = 'cancelada', observacao = 'Paciente teve um imprevisto'
+-- 11. Cancelar consulta e registrar justificativa
+UPDATE Consulta 
+SET status = 'cancelada', justificativa_cancelamento = 'Paciente testou positivo para COVID'
 WHERE id_consulta = 2 AND status = 'agendada';
 
--- 12. Exclusão de especialidade
-DELETE FROM ESPECIALIDADE WHERE id_especialidade = 1;
--- Explicação: Como a chave id_especialidade é FK na tabela CONSULTA, o banco de dados impedirá a exclusão (erro de restrição de chave estrangeira), mantendo a integridade dos dados históricos.
+-- 12. Exclusão de especialidade com médicos associados
+DELETE FROM Especialidade WHERE id_especialidade = 1;
+-- Comportamento esperado: O banco bloqueará a exclusão (Erro de Foreign Key Constraint) porque existem registros filhos na tabela Medico_Especialidade ou Consulta dependendo deste ID, garantindo a integridade referencial.
