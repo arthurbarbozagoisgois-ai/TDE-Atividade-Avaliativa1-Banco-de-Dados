@@ -1,0 +1,8 @@
+  --- 22. Índice composto
+CREATE INDEX idx_consulta_med_stat_data ON CONSULTA(id_medico, status, data);
+
+--- 23. Índice UNIQUE
+CREATE UNIQUE INDEX idx_paciente_cpf ON PACIENTE(cpf_paciente);
+
+--- 24. Índice para busca descendente
+CREATE INDEX idx_consulta_paciente_data_desc ON CONSULTA(id_paciente, data DESC);
